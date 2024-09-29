@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Finance Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background-color: #f8f9fa;
+      margin: 10px 0;
+      padding: 10px;
+      border-left: 5px solid #007bff;
+    }
+    li.expense {
+      border-color: #dc3545;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.2em;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Personal Finance Manager</h1>
+
+  <div class="container">
+    <h2>Add Transaction</h2>
+    <form id="transaction-form">
+      <input type="text" id="description" placeholder="Description" required>
+      <input type="number" id="amount" placeholder="Amount" required>
+      <select id="type">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <button type="submit">Add Transaction</button>
+    </form>
+
+    <h2>Transactions</h2>
+    <ul id="transaction-list"></ul>
+
+    <div class="total">
+      Total Balance: $<span id="total-balance">0.00</span>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('transaction-form');
+    const transactionList = document.getElementById('transaction-list');
+    const totalBalance = document.getElementById('total-balance');
+
+    let transactions = [];
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const description = document.getElementById('description').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+
+      const transaction = {
+        description,
+        amount: type === 'income' ? amount : -amount,
+        type
+      };
+
+      transactions.push(transaction);
+      displayTransactions();
+      updateBalance();
+
+      form.reset();
+    });
+
+    function displayTransactions() {
+      transactionList.innerHTML = '';
+      transactions.forEach((transaction, index) => {
+        const li = document.createElement('li');
+        li.classList.add(transaction.type === 'income' ? 'income' : 'expense');
+        li.innerHTML = `
+          ${transaction.description} - $${Math.abs(transaction.amount).toFixed(2)}
+          <button onclick="deleteTransaction(${index})">X</button>
+        `;
+        transactionList.appendChild(li);
+      });
+    }
+
+    function updateBalance() {
+      const total = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+      totalBalance.textContent = total.toFixed(2);
+    }
+
+    function deleteTransaction(index) {
+      transactions.splice(index, 1);
+      displayTransactions();
+      updateBalance();
+    }
+  </script>
+</body>
+</html>
